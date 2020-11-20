@@ -57,7 +57,7 @@ class MapProblem(GraphProblem):
         for i in junction.outgoing_links:
             successor_state = MapState(i.target)
             yield OperatorResult(successor_state, i.distance)
-        # TODO [Ex.10]:
+        # TODO [Ex.10]:f
         #  Read the documentation of this method in the base class `GraphProblem.expand_state_with_costs()`.
         #  Finish the implementation of this method.
         #  Iterate over the outgoing links of the current junction (find the implementation of `Junction`

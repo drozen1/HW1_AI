@@ -79,7 +79,10 @@ class MDAState(GraphProblemState):
         #   (using equals `==` operator) because the class `Junction` explicitly
         #   implements the `__eq__()` method. The types `frozenset`, `ApartmentWithSymptomsReport`, `Laboratory`
         #   are also comparable (in the same manner).
-        raise NotImplementedError  # TODO: remove this line.
+        return self.current_site==other.current_site and self.tests_on_ambulance==other.tests_on_ambulance\
+            and self.nr_matoshim_on_ambulance == other.nr_matoshim_on_ambulance and \
+               self.tests_transferred_to_lab == other.tests_transferred_to_lab and self.visited_labs == other.visited_labs
+        #raise NotImplementedError  # TODO: remove this line.
 
     def __hash__(self):
         """
@@ -93,14 +96,16 @@ class MDAState(GraphProblemState):
 
     def get_total_nr_tests_taken_and_stored_on_ambulance(self) -> int:
         """
-        This method returns the total number of of tests that are stored on the ambulance in this state.
+        This method returns the total number of tests that are stored on the ambulance in this state.
         TODO [Ex.17]: Implement this method.
          Notice that this method can be implemented using a single line of code - do so!
          Use python's built-it `sum()` function.
          Notice that `sum()` can receive an *ITERATOR* as argument; That is, you can simply write something like this:
-        >>> sum(<some expression using item> for item in some_collection_of_items)
-        """
-        raise NotImplementedError  # TODO: remove this line.
+         """
+
+        return sum(item.nr_roommates for item in self.tests_on_ambulance)
+        # tests_on_ambulance: FrozenSet[ApartmentWithSymptomsReport]
+        #raise NotImplementedError  # TODO: remove this line.
 
 
 class MDAOptimizationObjective(Enum):
@@ -245,7 +250,20 @@ class MDAProblem(GraphProblem):
                                 its first `k` items and until the `n`-th item.
             You might find this tip useful for summing a slice of a collection.
         """
-        raise NotImplementedError  # TODO: remove this line!
+        distance_cost = self.map_distance_finder.get_map_cost_between(self.streets_map[prev_state.current_site.report_id],
+                                                      self.streets_map[succ_state.current_site.report_id])
+        if  prev_state.current_site in self.problem_input.laboratories:
+            distance_cost+=1
+        gas_price = self.problem_input.gas_liter_price
+        drive_gas_consumption = self.problem_input.ambulance.drive_gas_consumption_liter_per_meter
+        fridges_gas_consumption = self.problem_input.ambulance.fridges_gas_consumption_liter_per_meter
+        fridge_capacity = self.problem_input.ambulance.fridge_capacity
+        lab_test_transfer_cost = ...
+        lab_revisit_cost = ...
+
+
+        monetary_cost = gas_price * (drive_gas_consumption + fridges_gas_consumption) * distance_cost  #+...
+        return
 
     def is_goal(self, state: GraphProblemState) -> bool:
         """
@@ -282,7 +300,10 @@ class MDAProblem(GraphProblem):
                 generated set.
             Note: This method can be implemented using a single line of code. Try to do so.
         """
-        raise NotImplementedError  # TODO: remove this line!
+        apartments_waiting_to_visit = list(self.problem_input.reported_apartments - (state.tests_on_ambulance.union(state.tests_transferred_to_lab)))
+        sorted(apartments_waiting_to_visit.sort(key = lambda report_id: ApartmentWithSymptomsReport.report_id))
+        return apartments_waiting_to_visit
+        #raise NotImplementedError  # TODO: remove this line!
 
     def get_all_certain_junctions_in_remaining_ambulance_path(self, state: MDAState) -> List[Junction]:
         """
