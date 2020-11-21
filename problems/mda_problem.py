@@ -74,7 +74,7 @@ class MDAState(GraphProblemState):
         """
         assert isinstance(other, MDAState)
 
-        # TODO [Ex.17]: Complete the implementation of this method!
+        # [Ex.17]: Complete the implementation of this method!
         #  Note that you can simply compare two instances of `Junction` type
         #   (using equals `==` operator) because the class `Junction` explicitly
         #   implements the `__eq__()` method. The types `frozenset`, `ApartmentWithSymptomsReport`, `Laboratory`
@@ -82,7 +82,7 @@ class MDAState(GraphProblemState):
         return self.current_site==other.current_site and self.tests_on_ambulance==other.tests_on_ambulance\
             and self.nr_matoshim_on_ambulance == other.nr_matoshim_on_ambulance and \
                self.tests_transferred_to_lab == other.tests_transferred_to_lab and self.visited_labs == other.visited_labs
-        #raise NotImplementedError  # TODO: remove this line.
+
 
     def __hash__(self):
         """
@@ -97,7 +97,7 @@ class MDAState(GraphProblemState):
     def get_total_nr_tests_taken_and_stored_on_ambulance(self) -> int:
         """
         This method returns the total number of tests that are stored on the ambulance in this state.
-        TODO [Ex.17]: Implement this method.
+        [Ex.17]: Implement this method.
          Notice that this method can be implemented using a single line of code - do so!
          Use python's built-it `sum()` function.
          Notice that `sum()` can receive an *ITERATOR* as argument; That is, you can simply write something like this:
@@ -105,7 +105,6 @@ class MDAState(GraphProblemState):
 
         return sum(item.nr_roommates for item in self.tests_on_ambulance)
         # tests_on_ambulance: FrozenSet[ApartmentWithSymptomsReport]
-        #raise NotImplementedError  # TODO: remove this line.
 
 
 class MDAOptimizationObjective(Enum):
@@ -189,7 +188,7 @@ class MDAProblem(GraphProblem):
 
     def expand_state_with_costs(self, state_to_expand: GraphProblemState) -> Iterator[OperatorResult]:
         """
-        TODO [Ex.17]: Implement this method!
+        [Ex.17]: Implement this method!
         This method represents the `Succ: S -> P(S)` function of the MDA problem.
         The `Succ` function is defined by the problem operators as shown in class.
         The MDA problem operators are defined in the assignment instructions.
@@ -218,14 +217,32 @@ class MDAProblem(GraphProblem):
         """
 
         assert isinstance(state_to_expand, MDAState)
-        raise NotImplementedError  # TODO: remove this line!
+        # places_we_can_visit = state_to_expand.current_site.outgoing_links
+        # for edge in places_we_can_visit:
+        #     free_space_in_fridge = self.problem_input.ambulance.total_fridges_capacity - \
+        #                            self.get_total_nr_tests_taken_and_stored_on_ambulance()
+        #     #if it is and apartment
+        #     if self.streets_map[edge.target] in  self.problem_input.reported_apartments:
+        #         #we werent in the appartment +  we have tests for all the people + we have space in the fridge
+        #         if self.streets_map[edge.target] in self.get_reported_apartments_waiting_to_visit() and
+        #              MDAState.nr_matoshim_on_ambulance >= app.roomates and
+        #              free_space_in_fridge>= app.roomates:
+        #                 #change the state
+        #                  yield OperatorResult(state_to_expand,self.get_operator_cost(), ..... finish)
+        #
+        #     if self.streets_map[edge.target] in self.problem_input.laboratories:
+        #         #we have tests in the fridge or we werent in the lab
+        #         if free_space_in_fridge != 0 or (self.streets_map[edge.target] not in MDAState.visited_labs) :
+        #             yield OperatorResult(state_to_expand, self.get_operator_cost(), ..... finish)
+
+        raise NotImplementedError
 
     def get_operator_cost(self, prev_state: MDAState, succ_state: MDAState) -> MDACost:
         """
         Calculates the operator cost (of type `MDACost`) of an operator (moving from the `prev_state`
          to the `succ_state`). The `MDACost` type is defined above in this file (with explanations).
         Use the formal MDA problem's operator costs definition presented in the assignment-instructions.
-        TODO [Ex.17]: implement this method!
+        [Ex.17]: implement this method!
         Use the method `self.map_distance_finder.get_map_cost_between()` to calculate the distance
          between to junctions. This distance is used for calculating the 3 costs.
         If the location of the next state is not reachable (on the streets-map) from the location of
@@ -242,7 +259,7 @@ class MDAProblem(GraphProblem):
          function `math.ceil(some_float_value)`.
         Note: For calculating sum of a collection (list/tuple/set) in python, you can simply
          use `sum(some_collection)`.
-        Note: For getting a slice of an tuple/list in python you can use slicing indexing. examples:
+        TODO: Note: For getting a slice of an tuple/list in python you can use slicing indexing. examples:
             `some_tuple[:k]` - would create a new tuple with the first `k` elements of `some_tuple`.
             `some_tuple[k:]` - would create a new tuple that is based on `some_tuple` but without
                                its first `k` items.
@@ -250,30 +267,64 @@ class MDAProblem(GraphProblem):
                                 its first `k` items and until the `n`-th item.
             You might find this tip useful for summing a slice of a collection.
         """
+
+        #Calculate distance cost with function get_map_cost_between
         distance_cost = self.map_distance_finder.get_map_cost_between(self.streets_map[prev_state.current_site.report_id],
                                                       self.streets_map[succ_state.current_site.report_id])
-        if  prev_state.current_site in self.problem_input.laboratories:
+
+        #Check if the result of the last funcion is none
+        if distance_cost is None:
+            return MDACost(optimization_objective= float('inf'), distance_cost= float('inf'),
+            monetary_cost= float('inf'), tests_travel_distance_cost=float('inf'))
+
+        #Sum one like Indicator current location is a lab
+        if prev_state.current_site in self.problem_input.laboratories:
             distance_cost+=1
+
+        #Calculating the other values that we need
         gas_price = self.problem_input.gas_liter_price
         drive_gas_consumption = self.problem_input.ambulance.drive_gas_consumption_liter_per_meter
-        fridges_gas_consumption = self.problem_input.ambulance.fridges_gas_consumption_liter_per_meter
+        fridges_gas_consumption = self.problem_input.ambulance.fridges_gas_consumption_liter_per_meter # is an array
         fridge_capacity = self.problem_input.ambulance.fridge_capacity
-        lab_test_transfer_cost = ...
-        lab_revisit_cost = ...
+
+        lab_test_transferCost = succ_state.current_site.tests_transfer_cost
+        lab_revisit_cost = succ_state.current_site.revisit_extra_cost
+
+        #Calculating total fridges gas consumption
+        active_fridges = math.ceil(MDAState.get_total_nr_tests_taken_and_stored_on_ambulance()/ fridge_capacity)
+        total_fridges_gas_consumption = 0
+        for i in range(0,active_fridges+1): #plus 1? we want to include active_fridges
+            total_fridges_gas_consumption = fridges_gas_consumption[i]
 
 
-        monetary_cost = gas_price * (drive_gas_consumption + fridges_gas_consumption) * distance_cost  #+...
-        return
+        #Indicator taken != empty
+        if len(prev_state.tests_on_ambulance) == 0:
+            lab_test_transferCost = 0
+
+        #Indicator current location is a visited lab
+        if succ_state.current_site not in self.problem_input.laboratories:
+            lab_revisit_cost = 0
+
+        #Calculating monetary cost
+        monetary_cost = gas_price * (drive_gas_consumption + total_fridges_gas_consumption) * distance_cost \
+                        * (lab_test_transferCost + lab_revisit_cost)
+
+        #Calculating test travel cost
+        test_travel = MDAState.get_total_nr_tests_taken_and_stored_on_ambulance() * distance_cost
+        return MDACost(optimization_objective= MDACost.optimization_objective, distance_cost= distance_cost,
+                       #not sure of optimization objective
+            monetary_cost= monetary_cost, tests_travel_distance_cost=test_travel)
 
     def is_goal(self, state: GraphProblemState) -> bool:
         """
         This method receives a state and returns whether this state is a goal.
-        TODO [Ex.17]: implement this method using a single `return` line!
+        [Ex.17]: implement this method using a single `return` line!
          Use sets/frozensets comparison (`some_set == some_other_set`).
          In order to create a set from some other collection (list/tuple) you can just `set(some_other_collection)`.
         """
         assert isinstance(state, MDAState)
-        raise NotImplementedError  # TODO: remove the line!
+        #we use set operations in get_reported_apartments_waiting_to_visit so thats ok
+        return self.get_reported_apartments_waiting_to_visit(state_to_expand) == 0
 
     def get_zero_cost(self) -> Cost:
         """
@@ -289,7 +340,7 @@ class MDAProblem(GraphProblem):
         This method returns a list of all reported-apartments that haven't been visited yet.
         For the sake of determinism considerations, the returned list has to be sorted by
          the apartment's report id in an ascending order.
-        TODO [Ex.17]: Implement this method.
+        [Ex.17]: Implement this method.
             Use sets difference operation (`some_set - some_other_set`).
             Use `list(some_set)` to create a list from some given set, and then use
                 `some_list_instance.sort(key=...)` to sort this list. Use a `lambda`
@@ -303,7 +354,6 @@ class MDAProblem(GraphProblem):
         apartments_waiting_to_visit = list(self.problem_input.reported_apartments - (state.tests_on_ambulance.union(state.tests_transferred_to_lab)))
         sorted(apartments_waiting_to_visit.sort(key = lambda report_id: ApartmentWithSymptomsReport.report_id))
         return apartments_waiting_to_visit
-        #raise NotImplementedError  # TODO: remove this line!
 
     def get_all_certain_junctions_in_remaining_ambulance_path(self, state: MDAState) -> List[Junction]:
         """
@@ -315,4 +365,7 @@ class MDAProblem(GraphProblem):
             Use the method `self.get_reported_apartments_waiting_to_visit(state)`.
             Use python's `sorted(some_list, key=...)` function.
         """
-        raise NotImplementedError  # TODO: remove this line!
+
+
+
+

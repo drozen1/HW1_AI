@@ -34,7 +34,7 @@ class CachedMapDistanceFinder:
 
     def get_map_cost_between(self, src_junction: Junction, tgt_junction: Junction) -> Optional[Cost]:
         """
-        TODO [Ex.17]: Implement this method!
+        [Ex.17]: Implement this method!
         If the distance for the given source & target junctions is already stored in the cache, just return it.
         If the distance has not been stored in the cache yet, create a `MapProblem` with the given source & target,
          solve this problem using the `self.map_problem_solver` (that is given in the c'tor), store the cost of
@@ -45,5 +45,16 @@ class CachedMapDistanceFinder:
          access the `_cache` field directly.
         The cache key should include the source & target indices.
         """
+        #we check if it is in the cache
+        if self._is_in_cache(src_junction, tgt_junction):
+            return self._get_from_cache([src_junction.index, tgt_junction.index])
 
-        raise NotImplementedError  # TODO: remove this line!
+        #if not, we have to solve the map problem
+        map = MapProblem(src_junction, tgt_junction)
+        res = map.solve_problem(self.map_problem_solver)
+        if res is None:
+            return None
+
+        #saving in cache
+        self._insert_to_cache([src_junction.index, tgt_junction.index])
+        return self._get_from_cache([src_junction.index, tgt_junction.index])

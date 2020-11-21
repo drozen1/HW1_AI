@@ -45,7 +45,7 @@ class AStar(BestFirstSearch):
         Should calculate and return the f-score of the given node.
         This score is used as a priority of this node in the open priority queue.
 
-        TODO [Ex.11]: implement this method.
+        [Ex.11]: implement this method.
         Remember: In Weighted-A* the f-score is defined by ((1-w) * cost) + (w * h(state)).
         Notice: You may use `search_node.g_cost`, `self.heuristic_weight`, and `self.heuristic_function`.
         """

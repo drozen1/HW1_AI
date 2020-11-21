@@ -22,7 +22,7 @@ def plot_distance_and_expanded_wrt_weight_figure(
     """
     Use `matplotlib` to generate a figure of the distance & #expanded-nodes
      w.r.t. the weight.
-    TODO [Ex.15]: Complete the implementation of this method.
+    [Ex.15]: Complete the implementation of this method.
     """
     weights, total_cost, total_nr_expanded = np.array(weights), np.array(total_cost), np.array(total_nr_expanded)
     assert len(weights) == len(total_cost) == len(total_nr_expanded)
@@ -32,14 +32,13 @@ def plot_distance_and_expanded_wrt_weight_figure(
 
     fig, ax1 = plt.subplots()
 
-    # TODO: Plot the total distances with ax1. Use `ax1.plot(...)`.
-    # TODO: Make this curve colored blue with solid line style.
-    # TODO: Set its label to be 'Solution cost'.
+    #  Plot the total distances with ax1. Use `ax1.plot(...)`.
+    #  Make this curve colored blue with solid line style.
+    #  Set its label to be 'Solution cost'.
     # See documentation here:
     # https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.plot.html
     # You can also Google for additional examples.
-    #raise NotImplementedError  # TODO: remove this line!
-    p1, = ax1.plot(weights, total_cost, color= 'b')  # TODO: pass the relevant params instead of `...`.
+    p1, = ax1.plot(weights, total_cost, color= 'b')  # pass the relevant params instead of `...`.
     # ax1: Make the y-axis label, ticks and tick labels match the line color.
     ax1.set_ylabel('Solution cost', color='b')
     ax1.tick_params('y', colors='b')
@@ -48,11 +47,11 @@ def plot_distance_and_expanded_wrt_weight_figure(
     # Create another axis for the #expanded curve.
     ax2 = ax1.twinx()
 
-    # TODO: Plot the total expanded with ax2. Use `ax2.plot(...)`.
-    # TODO: Make this curve colored red with solid line style.
-    # TODO: Set its label to be '#Expanded states'.
+    # Plot the total expanded with ax2. Use `ax2.plot(...)`.
+    # Make this curve colored red with solid line style.
+    # Set its label to be '#Expanded states'.
     #raise NotImplementedError  # TODO: remove this line!
-    p2, = ax2.plot(weights, total_nr_expanded, color= 'r')  # TODO: pass the relevant params instead of `...`.
+    p2, = ax2.plot(weights, total_nr_expanded, color= 'r')  #  pass the relevant params instead of `...`.
 
     # ax2: Make the y-axis label, ticks and tick labels match the line color.
     ax2.set_ylabel('#Expanded states', color='r')
@@ -69,7 +68,7 @@ def plot_distance_and_expanded_wrt_weight_figure(
 def run_astar_for_weights_in_range(heuristic_type: HeuristicFunctionType, problem: GraphProblem, n: int = 30,
                                    max_nr_states_to_expand: Optional[int] = 40_000,
                                    low_heuristic_weight: float = 0.5, high_heuristic_weight: float = 0.95):
-    # TODO [Ex.15]:
+    # [Ex.15]:
     #  1. Create an array of `n` numbers equally spread in the segment
     #     [low_heuristic_weight, high_heuristic_weight]
     #     (including the edges). You can use `np.linspace()` for that.
@@ -84,7 +83,7 @@ def run_astar_for_weights_in_range(heuristic_type: HeuristicFunctionType, proble
     #     Don't forget to pass `max_nr_states_to_expand` to the AStar c'tor.
     #  3. Call the function `plot_distance_and_expanded_wrt_weight_figure()`
     #     with these 3 generated lists.
-    # raise NotImplementedError  # TODO: remove this line!
+
     arr= np.linspace(low_heuristic_weight,high_heuristic_weight,n)
     cost_list = []
     expanded_states_list = []
@@ -107,7 +106,7 @@ def toy_map_problem_experiments():
     print('Solve the map problem.')
 
     # Ex.10
-    # TODO: Just run it and inspect the printed result.
+    # Just run it and inspect the printed result.
     toy_map_problem = MapProblem(streets_map, 54, 549)
     uc = UniformCost()
     res = uc.solve_problem(toy_map_problem)
@@ -115,27 +114,25 @@ def toy_map_problem_experiments():
 
 
     # Ex.12
-    # TODO: create an instance of `AStar` with the `NullHeuristic`,
+    #create an instance of `AStar` with the `NullHeuristic`,
     #       solve the same `toy_map_problem` with it and print the results (as before).
     # Notice: AStar constructor receives the heuristic *type* (ex: `MyHeuristicClass`),
     #         and NOT an instance of the heuristic (eg: not `MyHeuristicClass()`).
-    # exit()  # TODO: remove!
 
     ascheck = AStar(NullHeuristic)
     res = ascheck.solve_problem(toy_map_problem)
     print(res)
 
     # Ex.13
-    # TODO: create an instance of `AStar` with the `AirDistHeuristic`,
+    #  create an instance of `AStar` with the `AirDistHeuristic`,
     #       solve the same `toy_map_problem` with it and print the results (as before).
-   # exit()  # TODO: remove!
 
     ascheck = AStar(AirDistHeuristic)
     res = ascheck.solve_problem(toy_map_problem)
     print(res)
 
     # Ex.15
-    # TODO:
+    #
     #  1. Complete the implementation of the function
     #     `run_astar_for_weights_in_range()` (upper in this file).
     #  2. Complete the implementation of the function
@@ -143,7 +140,7 @@ def toy_map_problem_experiments():
     #     (upper in this file).
     #  3. Call here the function `run_astar_for_weights_in_range()`
     #     with `AirDistHeuristic` and `toy_map_problem`.
-    #exit()  # TODO: remove!
+
     run_astar_for_weights_in_range(AirDistHeuristic, toy_map_problem)
 
 # --------------------------------------------------------------------
