@@ -251,19 +251,18 @@ class MDAProblem(GraphProblem):
 
         for lab in labs:
             # we have tests in the fridge or we werent in the lab
-            if (free_space_in_fridge != 0 or (lab not in state_to_expand.visited_labs)):
+
+            if (state_to_expand.get_total_nr_tests_taken_and_stored_on_ambulance() != 0 or (lab not in state_to_expand.visited_labs)):
 
                 # creating next state
                 next_site = lab
-                next_tests_on_ambulance = state_to_expand.tests_on_ambulance
-                next_tests_transferred_to_lab = state_to_expand.tests_transferred_to_lab | \
-                                                state_to_expand.tests_on_ambulance
+                next_tests_transferred_to_lab = state_to_expand.tests_transferred_to_lab | state_to_expand.tests_on_ambulance
+                next_tests_on_ambulance = frozenset({})
                 next_nr_matoshim_on_ambulance = state_to_expand.nr_matoshim_on_ambulance
-
+                next_visited_labs = state_to_expand.visited_labs
                 if lab not in state_to_expand.visited_labs:
                     next_nr_matoshim_on_ambulance += lab.max_nr_matoshim
-
-                next_visited_labs = state_to_expand.visited_labs | frozenset({lab})
+                    next_visited_labs = state_to_expand.visited_labs | frozenset({lab})
 
                 next_state = MDAState(current_site=next_site, tests_on_ambulance=next_tests_on_ambulance,
                                           tests_transferred_to_lab=next_tests_transferred_to_lab,
@@ -392,12 +391,8 @@ class MDAProblem(GraphProblem):
                 generated set.
             Note: This method can be implemented using a single line of code. Try to do so.
         """
-        reported_apartments_set = set(self.problem_input.reported_apartments)
-        tests_on_ambulance_set = set(state.tests_on_ambulance)
-        tests_transferred_to_lab_set= set(state.tests_transferred_to_lab)
 
-        apartments_waiting_to_visit = list(reported_apartments_set -
-                                            (tests_on_ambulance_set | tests_transferred_to_lab_set))
+        apartments_waiting_to_visit = list(set(self.problem_input.reported_apartments) - (state.tests_on_ambulance | state.tests_transferred_to_lab))
         apartments_waiting_to_visit.sort(key = lambda d: d.report_id)
         return apartments_waiting_to_visit
 
