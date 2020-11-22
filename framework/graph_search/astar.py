@@ -50,11 +50,6 @@ class AStar(BestFirstSearch):
         Notice: You may use `search_node.g_cost`, `self.heuristic_weight`, and `self.heuristic_function`.
         """
         return search_node.g_cost*(1-self.heuristic_weight)+self.heuristic_weight*self.heuristic_function.estimate(search_node.state)
-        # x= search_node.g_cost * (1 - self.heuristic_weight)
-        # y=self.heuristic_weight
-        # z= self.heuristic_function.estimate(search_node.state)
-        # return x+(y*z)
-        #raise NotImplementedError  # TODO: remove this line!
 
     def _open_successor_node(self, problem: GraphProblem, successor_node: SearchNode):
         """

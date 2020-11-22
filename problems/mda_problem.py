@@ -222,7 +222,7 @@ class MDAProblem(GraphProblem):
         appartments_we_can_visit = self.get_reported_apartments_waiting_to_visit(state_to_expand)
 
         free_space_in_fridge = self.problem_input.ambulance.total_fridges_capacity - \
-                               self.get_total_nr_tests_taken_and_stored_on_ambulance()
+                               state_to_expand.get_total_nr_tests_taken_and_stored_on_ambulance()
 
         for app in appartments_we_can_visit:
             #we have tests for all the people + we have space in the fridge
@@ -230,10 +230,10 @@ class MDAProblem(GraphProblem):
 
                 #creating next state
                 next_site = app
-                next_tests_on_ambulance = state_to_expand.tests_on_ambulance.union(set(app))
+                next_tests_on_ambulance = state_to_expand.tests_on_ambulance | {app}
                 next_tests_transferred_to_lab= state_to_expand.tests_transferred_to_lab
-                next_nr_matoshim_on_ambulance = state_to_expand.nr_matoshim_on_ambulance - app.nr_roommate
-                next_visited_labs =  state_to_expand.visited_labs
+                next_nr_matoshim_on_ambulance = state_to_expand.nr_matoshim_on_ambulance - app.nr_roommates
+                next_visited_labs = state_to_expand.visited_labs
 
                 next_state = MDAState(current_site= next_site,tests_on_ambulance=next_tests_on_ambulance,
                     tests_transferred_to_lab= next_tests_transferred_to_lab,
@@ -262,7 +262,7 @@ class MDAProblem(GraphProblem):
                 if lab not in state_to_expand.visited_labs:
                     next_nr_matoshim_on_ambulance += lab.max_nr_matoshim
 
-                next_visited_labs = state_to_expand.visited_labs.union(set(lab))
+                next_visited_labs = state_to_expand.visited_labs | {lab}
 
                 next_state = MDAState(current_site=next_site, tests_on_ambulance=next_tests_on_ambulance,
                                           tests_transferred_to_lab=next_tests_transferred_to_lab,
@@ -305,8 +305,7 @@ class MDAProblem(GraphProblem):
         """
 
         #Calculate distance cost with function get_map_cost_between
-        distance_cost = self.map_distance_finder.get_map_cost_between(self.streets_map[prev_state.current_site.report_id],
-                                                      self.streets_map[succ_state.current_site.report_id])
+        distance_cost = self.map_distance_finder.get_map_cost_between(prev_state.current_site,succ_state.current_site)
 
         #Check if the result of the last funcion is none
         if distance_cost is None:
@@ -361,6 +360,7 @@ class MDAProblem(GraphProblem):
         assert isinstance(state, MDAState)
         #we use set operations in get_reported_apartments_waiting_to_visit so thats ok
         return self.get_reported_apartments_waiting_to_visit(state) == 0
+    #TODO: maybe check if we are in a lab
 
     def get_zero_cost(self) -> Cost:
         """
@@ -390,9 +390,10 @@ class MDAProblem(GraphProblem):
         reported_apartments_set = set(self.problem_input.reported_apartments)
         tests_on_ambulance_set = set(state.tests_on_ambulance)
         tests_transferred_to_lab_set= set(state.tests_transferred_to_lab)
-        apartments_waiting_to_visit = list( reported_apartments_set -
-                                            (tests_on_ambulance_set.union(tests_transferred_to_lab_set)))
-        apartments_waiting_to_visit = sorted(apartments_waiting_to_visit.sort(key = lambda report_id: ApartmentWithSymptomsReport.report_id))
+
+        apartments_waiting_to_visit = list(reported_apartments_set -
+                                            (tests_on_ambulance_set | tests_transferred_to_lab_set))
+        apartments_waiting_to_visit.sort(key = lambda d: d.report_id)
         return apartments_waiting_to_visit
 
     def get_all_certain_junctions_in_remaining_ambulance_path(self, state: MDAState) -> List[Junction]:
@@ -413,7 +414,7 @@ class MDAProblem(GraphProblem):
         junctions_in_remaining_ambulance_path.append(self.get_reported_apartments_waiting_to_visit(state))
 
         #Sorting
-        junctions_in_remaining_ambulance_path = sorted(junctions_in_remaining_ambulance_path, key = Junction.index)
+        sorted(junctions_in_remaining_ambulance_path, key = Junction.index)
         #not sure of key = Junction.index
 
         return junctions_in_remaining_ambulance_path
