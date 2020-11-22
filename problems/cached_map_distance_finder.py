@@ -50,12 +50,14 @@ class CachedMapDistanceFinder:
             return self._get_from_cache([src_junction.index, tgt_junction.index])
 
         # if not, we have to solve the map problem
-        map = MapProblem(self.streets_map, src_junction, tgt_junction)
+        map = MapProblem(self.streets_map, src_junction.index, tgt_junction.index)
         sol = self.map_problem_solver
         res = sol.solve_problem(map)
+
         if res is None:
+            self._insert_to_cache((src_junction.index, tgt_junction.index), None)
             return None
 
         # saving in cache
-        self._insert_to_cache([src_junction.index, tgt_junction.index])
-        return self._get_from_cache([src_junction.index, tgt_junction.index])
+        self._insert_to_cache((src_junction.index, tgt_junction.index), res.solution_cost)
+        return self._get_from_cache((src_junction.index, tgt_junction.index))
