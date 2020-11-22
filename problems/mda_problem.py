@@ -225,52 +225,63 @@ class MDAProblem(GraphProblem):
                                state_to_expand.get_total_nr_tests_taken_and_stored_on_ambulance()
 
         for app in appartments_we_can_visit:
-            #we have tests for all the people + we have space in the fridge
-            if (state_to_expand.nr_matoshim_on_ambulance >= app.nr_roommates) and (free_space_in_fridge >= app.nr_roommates):
 
-                #creating next state
-                next_site = app
-                next_tests_on_ambulance = state_to_expand.tests_on_ambulance | {app}
-                next_tests_transferred_to_lab= state_to_expand.tests_transferred_to_lab
-                next_nr_matoshim_on_ambulance = state_to_expand.nr_matoshim_on_ambulance - app.nr_roommates
-                next_visited_labs = state_to_expand.visited_labs
+            #we have edge to the appartment
+            for link in state_to_expand.current_site.outgoing_links:
+                if link.target is app.location.index:
 
-                next_state = MDAState(current_site= next_site,tests_on_ambulance=next_tests_on_ambulance,
-                    tests_transferred_to_lab= next_tests_transferred_to_lab,
-                    nr_matoshim_on_ambulance= next_nr_matoshim_on_ambulance,
-                    visited_labs=next_visited_labs)
+                    #we have tests for all the people + we have space in the fridge
+                    if (state_to_expand.nr_matoshim_on_ambulance >= app.nr_roommates) and \
+                        (free_space_in_fridge >= app.nr_roommates):
+
+                        #creating next state
+                        next_site = app
+                        next_tests_on_ambulance = state_to_expand.tests_on_ambulance | {app}
+                        next_tests_transferred_to_lab= state_to_expand.tests_transferred_to_lab
+                        next_nr_matoshim_on_ambulance = state_to_expand.nr_matoshim_on_ambulance - app.nr_roommates
+                        next_visited_labs = state_to_expand.visited_labs
+
+                        next_state = MDAState(current_site= next_site,tests_on_ambulance=next_tests_on_ambulance,
+                            tests_transferred_to_lab= next_tests_transferred_to_lab,
+                            nr_matoshim_on_ambulance= next_nr_matoshim_on_ambulance,
+                            visited_labs=next_visited_labs)
 
 
-                operator_name = "visit " + app.reporter_name
-                yield OperatorResult(next_state ,self.get_operator_cost(state_to_expand, next_state), operator_name)
+                        operator_name = "visit " + app.reporter_name
+                        yield OperatorResult(next_state ,self.get_operator_cost(state_to_expand, next_state), operator_name)
 
         #Same with the labs
         # We iterate over all the labs that we can visit
         labs = self.problem_input.laboratories
 
         for lab in labs:
-            # we have tests in the fridge or we werent in the lab
-            if free_space_in_fridge != 0 or (lab not in state_to_expand.visited_labs):
 
-                # creating next state
-                next_site = lab
-                next_tests_on_ambulance = state_to_expand.tests_on_ambulance
-                next_tests_transferred_to_lab = state_to_expand.tests_transferred_to_lab + \
-                                                self.get_total_nr_tests_taken_and_stored_on_ambulance()
-                next_nr_matoshim_on_ambulance = state_to_expand.nr_matoshim_on_ambulance
+            #we have edge to the lab
+            for link in state_to_expand.current_site.outgoing_links:
+                if link.target is lab.location.index:
 
-                if lab not in state_to_expand.visited_labs:
-                    next_nr_matoshim_on_ambulance += lab.max_nr_matoshim
+                    # we have tests in the fridge or we werent in the lab
+                    if (free_space_in_fridge != 0 or (lab not in state_to_expand.visited_labs)):
 
-                next_visited_labs = state_to_expand.visited_labs | {lab}
+                        # creating next state
+                        next_site = lab
+                        next_tests_on_ambulance = state_to_expand.tests_on_ambulance
+                        next_tests_transferred_to_lab = state_to_expand.tests_transferred_to_lab + \
+                                                        self.get_total_nr_tests_taken_and_stored_on_ambulance()
+                        next_nr_matoshim_on_ambulance = state_to_expand.nr_matoshim_on_ambulance
 
-                next_state = MDAState(current_site=next_site, tests_on_ambulance=next_tests_on_ambulance,
-                                          tests_transferred_to_lab=next_tests_transferred_to_lab,
-                                          nr_matoshim_on_ambulance=next_nr_matoshim_on_ambulance,
-                                          visited_labs=next_visited_labs)
+                        if lab not in state_to_expand.visited_labs:
+                            next_nr_matoshim_on_ambulance += lab.max_nr_matoshim
 
-                operator_name = "go to lab  " + lab.name
-                yield OperatorResult(next_state, self.get_operator_cost(state_to_expand, next_state), operator_name)
+                        next_visited_labs = state_to_expand.visited_labs | {lab}
+
+                        next_state = MDAState(current_site=next_site, tests_on_ambulance=next_tests_on_ambulance,
+                                                  tests_transferred_to_lab=next_tests_transferred_to_lab,
+                                                  nr_matoshim_on_ambulance=next_nr_matoshim_on_ambulance,
+                                                  visited_labs=next_visited_labs)
+
+                        operator_name = "go to lab  " + lab.name
+                        yield OperatorResult(next_state, self.get_operator_cost(state_to_expand, next_state), operator_name)
 
 
     def get_operator_cost(self, prev_state: MDAState, succ_state: MDAState) -> MDACost:
@@ -330,7 +341,6 @@ class MDAProblem(GraphProblem):
         total_fridges_gas_consumption = 0
         for i in range(0,active_fridges+1): #plus 1? we want to include active_fridges
             total_fridges_gas_consumption = fridges_gas_consumption[i]
-
 
         #Indicator taken != empty
         if len(prev_state.tests_on_ambulance) == 0:
