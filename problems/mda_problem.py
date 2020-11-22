@@ -79,7 +79,7 @@ class MDAState(GraphProblemState):
         #   (using equals `==` operator) because the class `Junction` explicitly
         #   implements the `__eq__()` method. The types `frozenset`, `ApartmentWithSymptomsReport`, `Laboratory`
         #   are also comparable (in the same manner).
-        return self.current_site==other.current_site and self.tests_on_ambulance==other.tests_on_ambulance\
+        return self.current_location==other.current_location and self.tests_on_ambulance==other.tests_on_ambulance\
             and self.nr_matoshim_on_ambulance == other.nr_matoshim_on_ambulance and \
                self.tests_transferred_to_lab == other.tests_transferred_to_lab and self.visited_labs == other.visited_labs
 
@@ -230,20 +230,20 @@ class MDAProblem(GraphProblem):
                 (free_space_in_fridge >= app.nr_roommates):
 
                 #creating next state
-                next_site = app
-                next_tests_on_ambulance = state_to_expand.tests_on_ambulance | {app}
-                next_tests_transferred_to_lab= state_to_expand.tests_transferred_to_lab
-                next_nr_matoshim_on_ambulance = state_to_expand.nr_matoshim_on_ambulance - app.nr_roommates
-                next_visited_labs = state_to_expand.visited_labs
+                    next_site = app
+                    next_tests_on_ambulance = state_to_expand.tests_on_ambulance | frozenset({app})
+                    next_tests_transferred_to_lab= state_to_expand.tests_transferred_to_lab
+                    next_nr_matoshim_on_ambulance = state_to_expand.nr_matoshim_on_ambulance - app.nr_roommates
+                    next_visited_labs = state_to_expand.visited_labs
 
-                next_state = MDAState(current_site= next_site,tests_on_ambulance=next_tests_on_ambulance,
+                    next_state = MDAState(current_site= next_site,tests_on_ambulance=next_tests_on_ambulance,
                     tests_transferred_to_lab= next_tests_transferred_to_lab,
                     nr_matoshim_on_ambulance= next_nr_matoshim_on_ambulance,
                     visited_labs=next_visited_labs)
 
 
-                operator_name = "visit " + app.reporter_name
-                yield OperatorResult(next_state ,self.get_operator_cost(state_to_expand, next_state), operator_name)
+                    operator_name = "visit " + app.reporter_name
+                    yield OperatorResult(next_state ,self.get_operator_cost(state_to_expand, next_state), operator_name)
 
         #Same with the labs
         # We iterate over all the labs that we can visit
@@ -263,7 +263,7 @@ class MDAProblem(GraphProblem):
                 if lab not in state_to_expand.visited_labs:
                     next_nr_matoshim_on_ambulance += lab.max_nr_matoshim
 
-                next_visited_labs = state_to_expand.visited_labs | {lab}
+                next_visited_labs = state_to_expand.visited_labs | frozenset({lab})
 
                 next_state = MDAState(current_site=next_site, tests_on_ambulance=next_tests_on_ambulance,
                                           tests_transferred_to_lab=next_tests_transferred_to_lab,
@@ -310,8 +310,8 @@ class MDAProblem(GraphProblem):
 
         #Check if the result of the last funcion is none
         if distance_cost is None:
-            return MDACost(optimization_objective= self.optimization_objective, distance_cost= float('inf'),
-            monetary_cost= float('inf'), tests_travel_distance_cost=float('inf'))
+            return MDACost( distance_cost= float('inf'),
+            monetary_cost= float('inf'), tests_travel_distance_cost=float('inf'),optimization_objective= self.optimization_objective)
 
         #Sum one like Indicator current location is a lab
         if prev_state.current_site in self.problem_input.laboratories:
@@ -362,7 +362,9 @@ class MDAProblem(GraphProblem):
         """
         assert isinstance(state, MDAState)
         #we use set operations in get_reported_apartments_waiting_to_visit so thats ok
-        return self.get_reported_apartments_waiting_to_visit(state) == 0
+        return self.get_reported_apartments_waiting_to_visit(state) == 0 and isinstance(state.current_site , Laboratory)
+
+
     #TODO: maybe check if we are in a lab
 
     def get_zero_cost(self) -> Cost:
@@ -411,7 +413,7 @@ class MDAProblem(GraphProblem):
         """
 
         #We add the current location of the ambulance
-        junctions_in_remaining_ambulance_path = [state.current_site]
+        junctions_in_remaining_ambulance_path = [state.current_location]
 
         #We add the reported apartments that hasn't been visited yet.
         junctions_in_remaining_ambulance_path.append(self.get_reported_apartments_waiting_to_visit(state))
