@@ -313,7 +313,7 @@ class MDAProblem(GraphProblem):
 
         #Sum one like Indicator current location is a lab
         distance_cost_monetary = distance_cost
-        if prev_state.current_site in self.problem_input.laboratories:
+        if prev_state.current_location in self.problem_input.laboratories:
             distance_cost_monetary += 1
 
         #Calculating the other values that we need
@@ -321,33 +321,27 @@ class MDAProblem(GraphProblem):
         drive_gas_consumption = self.problem_input.ambulance.drive_gas_consumption_liter_per_meter
         fridges_gas_consumption = self.problem_input.ambulance.fridges_gas_consumption_liter_per_meter # is an array
         fridge_capacity = self.problem_input.ambulance.fridge_capacity
-        lab_test_transferCost = 0
-        lab_revisit_cost = 0
-
-        if isinstance(succ_state.current_site, Laboratory):
-            lab_test_transferCost = succ_state.current_site.tests_transfer_cost
-            lab_revisit_cost = succ_state.current_site.revisit_extra_cost
+        tests_on_ambulance = prev_state.get_total_nr_tests_taken_and_stored_on_ambulance()
 
         #Calculating total fridges gas consumption
-        active_fridges = math.ceil(prev_state.get_total_nr_tests_taken_and_stored_on_ambulance()/ fridge_capacity)
+        active_fridges = math.ceil(tests_on_ambulance/ fridge_capacity)
         total_fridges_gas_consumption = 0
-        for i in range(0,active_fridges): #plus 1? we want to include active_fridges
-            total_fridges_gas_consumption = fridges_gas_consumption[i]
-
-        #Indicator taken != empty
-        if len(prev_state.tests_on_ambulance) == 0:
-            lab_test_transferCost = 0
-
-        #Indicator current location is a visited lab
-        if succ_state.current_site not in self.problem_input.laboratories:
-            lab_revisit_cost = 0
+        for i in range(0,active_fridges): #plus 1?
+            total_fridges_gas_consumption += fridges_gas_consumption[i]
 
         #Calculating monetary cost
-        monetary_cost = gas_price * (drive_gas_consumption + total_fridges_gas_consumption) * distance_cost_monetary \
-                        * (lab_test_transferCost + lab_revisit_cost)
+        monetary_cost = gas_price * (drive_gas_consumption + total_fridges_gas_consumption) * distance_cost_monetary
+
+        if isinstance(succ_state.current_site, Laboratory):
+            # Indicator taken != empty
+            if tests_on_ambulance != 0:
+                monetary_cost+=  succ_state.current_site.tests_transfer_cost
+            # Indicator current location is a visited lab
+            if succ_state.current_location in self.problem_input.laboratories:
+                monetary_cost += succ_state.current_site.revisit_extra_cost
 
         #Calculating test travel cost
-        test_travel = prev_state.get_total_nr_tests_taken_and_stored_on_ambulance() * distance_cost
+        test_travel = tests_on_ambulance * distance_cost
 
         return MDACost(optimization_objective= self.optimization_objective, distance_cost= distance_cost,
             monetary_cost= monetary_cost, tests_travel_distance_cost=test_travel)
