@@ -192,9 +192,10 @@ def mda_problem_with_astar_experiments():
     # Ex.22
     # create an instance of `AStar` with the `MDAMaxAirDistHeuristic`,
     #       solve the `moderate_mda_problem_with_distance_cost` with it and print the results.
-    ascheck = AStar(MDAMaxAirDistHeuristic)
-    res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
-    print(res)
+
+    # ascheck = AStar(MDAMaxAirDistHeuristic)
+    # res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
+    # print(res)
 
     # Ex.25
     # create an instance of `AStar` with the `MDASumAirDistHeuristic`,
@@ -206,9 +207,9 @@ def mda_problem_with_astar_experiments():
     # Ex.28
     # create an instance of `AStar` with the `MDAMSTAirDistHeuristic`,
     #       solve the `moderate_mda_problem_with_distance_cost` with it and print the results.
-    # ascheck = AStar(MDAMSTAirDistHeuristic)
-    # res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
-    # print(res)
+    ascheck = AStar(MDAMSTAirDistHeuristic)
+    res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
+    print(res)
 
 
 def mda_problem_with_weighted_astar_experiments():

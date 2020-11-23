@@ -98,11 +98,11 @@ class MDASumAirDistHeuristic(HeuristicFunction):
             return 0
 
         #deleting the ambulance current site of the list
-        all_certain_junctions_in_remaining_ambulance_path.remove(state.current_site)
+        all_certain_junctions_in_remaining_ambulance_path.remove(state.current_location)
 
         #search for the next site to visit
         cost = 0
-        src = state.current_site
+        src = state.current_location
         while len(all_certain_junctions_in_remaining_ambulance_path) > 0:
             min_distance = float('inf')
             min_destination = Junction(float('inf'), 0 , 0, None, None)
@@ -158,7 +158,8 @@ class MDAMSTAirDistHeuristic(HeuristicFunction):
         for i in junctions:
             for j in junctions:
                 if i != j:
-                    graph.add_edge(i, j, self.cached_air_distance_calculator.get_air_distance_between_junctions(i,j))
+                    weight = self.cached_air_distance_calculator.get_air_distance_between_junctions(i,j)
+                    graph.add_edge(i, j, weight= weight)
 
         tree = nx.minimum_spanning_tree(graph)
         return tree.size(weight='weight')
