@@ -38,7 +38,7 @@ def plot_distance_and_expanded_wrt_weight_figure(
     # See documentation here:
     # https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.plot.html
     # You can also Google for additional examples.
-    p1, = ax1.plot(weights, total_cost, color= 'b')  # pass the relevant params instead of `...`.
+    p1, = ax1.plot(weights, total_cost, color= 'b', label="Solution cost")  # pass the relevant params instead of `...`.
     # ax1: Make the y-axis label, ticks and tick labels match the line color.
     ax1.set_ylabel('Solution cost', color='b')
     ax1.tick_params('y', colors='b')
@@ -51,7 +51,7 @@ def plot_distance_and_expanded_wrt_weight_figure(
     # Make this curve colored red with solid line style.
     # Set its label to be '#Expanded states'.
 
-    p2, = ax2.plot(weights, total_nr_expanded, color= 'r')  #  pass the relevant params instead of `...`.
+    p2, = ax2.plot(weights, total_nr_expanded, color= 'r', label="#Expanded states")  #  pass the relevant params instead of `...`.
 
     # ax2: Make the y-axis label, ticks and tick labels match the line color.
     ax2.set_ylabel('#Expanded states', color='r')
@@ -193,16 +193,16 @@ def mda_problem_with_astar_experiments():
     # create an instance of `AStar` with the `MDAMaxAirDistHeuristic`,
     #       solve the `moderate_mda_problem_with_distance_cost` with it and print the results.
 
-    # ascheck = AStar(MDAMaxAirDistHeuristic)
-    # res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
-    # print(res)
+    ascheck = AStar(MDAMaxAirDistHeuristic)
+    res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
+    print(res)
 
     # Ex.25
     # create an instance of `AStar` with the `MDASumAirDistHeuristic`,
     #       solve the `moderate_mda_problem_with_distance_cost` with it and print the results.
-    # ascheck = AStar(MDASumAirDistHeuristic)
-    # res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
-    # print(res)
+    ascheck = AStar(MDASumAirDistHeuristic)
+    res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
+    print(res)
 
     # Ex.28
     # create an instance of `AStar` with the `MDAMSTAirDistHeuristic`,
@@ -230,9 +230,9 @@ def mda_problem_with_weighted_astar_experiments():
     # Call here the function `run_astar_for_weights_in_range()`
     #       with `MDASumAirDistHeuristic`
     #       over the `moderate_mda_problem_with_distance_cost`.
-
+    print("beforee")
     run_astar_for_weights_in_range(MDASumAirDistHeuristic, moderate_mda_problem_with_distance_cost)
-
+    print("afterrr")
 
 
 def monetary_cost_objectives_mda_problem_experiments():
@@ -331,10 +331,10 @@ def mda_problem_anytime_astar_experiments():
 
 def run_all_experiments():
     print('Running all experiments')
-    #toy_map_problem_experiments()
+    toy_map_problem_experiments()
     #basic_mda_problem_experiments()
-    mda_problem_with_astar_experiments()
-    # mda_problem_with_weighted_astar_experiments()
+    #mda_problem_with_astar_experiments()
+    #mda_problem_with_weighted_astar_experiments()
     # monetary_cost_objectives_mda_problem_experiments()
     # multiple_objectives_mda_problem_experiments()
     # mda_problem_with_astar_epsilon_experiments()
