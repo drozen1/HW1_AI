@@ -104,7 +104,7 @@ class MDAState(GraphProblemState):
          """
 
         return sum(item.nr_roommates for item in self.tests_on_ambulance)
-        # tests_on_ambulance: FrozenSet[ApartmentWithSymptomsReport]
+
 
 
 class MDAOptimizationObjective(Enum):
@@ -218,7 +218,7 @@ class MDAProblem(GraphProblem):
 
         assert isinstance(state_to_expand, MDAState)
 
-        #We iterate over all the appartments that we can visit
+        # We iterate over all the appartments that we can visit
         appartments_we_can_visit = self.get_reported_apartments_waiting_to_visit(state_to_expand)
 
         free_space_in_fridge = self.problem_input.ambulance.total_fridges_capacity - \
@@ -246,13 +246,13 @@ class MDAProblem(GraphProblem):
                     yield OperatorResult(next_state ,self.get_operator_cost(state_to_expand, next_state), operator_name)
 
         #Same with the labs
-        # We iterate over all the labs that we can visit
+        #We iterate over all the labs that we can visit
         labs = self.problem_input.laboratories
 
         for lab in labs:
             # we have tests in the fridge or we werent in the lab
 
-            if (state_to_expand.get_total_nr_tests_taken_and_stored_on_ambulance() != 0 or (lab not in state_to_expand.visited_labs)):
+            if (state_to_expand.get_total_nr_tests_taken_and_stored_on_ambulance() != 0) or (lab not in state_to_expand.visited_labs):
 
                 # creating next state
                 next_site = lab
@@ -271,7 +271,6 @@ class MDAProblem(GraphProblem):
 
                 operator_name = "go to lab  " + lab.name
                 yield OperatorResult(next_state, self.get_operator_cost(state_to_expand, next_state), operator_name)
-
 
     def get_operator_cost(self, prev_state: MDAState, succ_state: MDAState) -> MDACost:
         """
@@ -313,8 +312,9 @@ class MDAProblem(GraphProblem):
             monetary_cost= float('inf'), tests_travel_distance_cost=float('inf'),optimization_objective= self.optimization_objective)
 
         #Sum one like Indicator current location is a lab
+        distance_cost_monetary = distance_cost
         if prev_state.current_site in self.problem_input.laboratories:
-            distance_cost+=1
+            distance_cost_monetary += 1
 
         #Calculating the other values that we need
         gas_price = self.problem_input.gas_liter_price
@@ -331,7 +331,7 @@ class MDAProblem(GraphProblem):
         #Calculating total fridges gas consumption
         active_fridges = math.ceil(prev_state.get_total_nr_tests_taken_and_stored_on_ambulance()/ fridge_capacity)
         total_fridges_gas_consumption = 0
-        for i in range(0,active_fridges+1): #plus 1? we want to include active_fridges
+        for i in range(0,active_fridges): #plus 1? we want to include active_fridges
             total_fridges_gas_consumption = fridges_gas_consumption[i]
 
         #Indicator taken != empty
@@ -343,7 +343,7 @@ class MDAProblem(GraphProblem):
             lab_revisit_cost = 0
 
         #Calculating monetary cost
-        monetary_cost = gas_price * (drive_gas_consumption + total_fridges_gas_consumption) * distance_cost \
+        monetary_cost = gas_price * (drive_gas_consumption + total_fridges_gas_consumption) * distance_cost_monetary \
                         * (lab_test_transferCost + lab_revisit_cost)
 
         #Calculating test travel cost
@@ -361,10 +361,8 @@ class MDAProblem(GraphProblem):
         """
         assert isinstance(state, MDAState)
         #we use set operations in get_reported_apartments_waiting_to_visit so thats ok
-        return self.get_reported_apartments_waiting_to_visit(state) == 0 and isinstance(state.current_site , Laboratory)
+        return (len(self.get_reported_apartments_waiting_to_visit(state)) == 0) and isinstance(state.current_site, Laboratory)
 
-
-    #TODO: maybe check if we are in a lab
 
     def get_zero_cost(self) -> Cost:
         """
@@ -392,7 +390,7 @@ class MDAProblem(GraphProblem):
             Note: This method can be implemented using a single line of code. Try to do so.
         """
 
-        apartments_waiting_to_visit = list(set(self.problem_input.reported_apartments) - (state.tests_on_ambulance | state.tests_transferred_to_lab))
+        apartments_waiting_to_visit = list((set(self.problem_input.reported_apartments)) - (state.tests_on_ambulance | state.tests_transferred_to_lab))
         apartments_waiting_to_visit.sort(key = lambda d: d.report_id)
         return apartments_waiting_to_visit
 
@@ -411,11 +409,12 @@ class MDAProblem(GraphProblem):
         junctions_in_remaining_ambulance_path = [state.current_location]
 
         #We add the reported apartments that hasn't been visited yet.
-        junctions_in_remaining_ambulance_path.append(self.get_reported_apartments_waiting_to_visit(state))
+        list = self.get_reported_apartments_waiting_to_visit(state)
+        for item in list:
+            junctions_in_remaining_ambulance_path.append(item.location)
 
         #Sorting
-        sorted(junctions_in_remaining_ambulance_path, key = Junction.index)
-        #not sure of key = Junction.index
+        sorted(junctions_in_remaining_ambulance_path, key= lambda k: k.index)
 
         return junctions_in_remaining_ambulance_path
 

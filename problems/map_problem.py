@@ -71,7 +71,7 @@ class MapProblem(GraphProblem):
             successor_state = MapState(i.target)
             yield OperatorResult(successor_state, i.distance)
 
-         #yield OperatorResult(successor_state=MapState(self.target_junction_id), operator_cost=7)
+
 
     def is_goal(self, state: GraphProblemState) -> bool:
 

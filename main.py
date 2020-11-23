@@ -199,16 +199,16 @@ def mda_problem_with_astar_experiments():
     # Ex.25
     # create an instance of `AStar` with the `MDASumAirDistHeuristic`,
     #       solve the `moderate_mda_problem_with_distance_cost` with it and print the results.
-    ascheck = AStar(MDASumAirDistHeuristic)
-    res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
-    print(res)
+    # ascheck = AStar(MDASumAirDistHeuristic)
+    # res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
+    # print(res)
 
     # Ex.28
     # create an instance of `AStar` with the `MDAMSTAirDistHeuristic`,
     #       solve the `moderate_mda_problem_with_distance_cost` with it and print the results.
-    ascheck = AStar(MDAMSTAirDistHeuristic)
-    res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
-    print(res)
+    # ascheck = AStar(MDAMSTAirDistHeuristic)
+    # res = ascheck.solve_problem(moderate_mda_problem_with_distance_cost)
+    # print(res)
 
 
 def mda_problem_with_weighted_astar_experiments():
@@ -331,13 +331,13 @@ def mda_problem_anytime_astar_experiments():
 def run_all_experiments():
     print('Running all experiments')
     #toy_map_problem_experiments()
-    basic_mda_problem_experiments()
+    #basic_mda_problem_experiments()
     mda_problem_with_astar_experiments()
-    mda_problem_with_weighted_astar_experiments()
-    monetary_cost_objectives_mda_problem_experiments()
-    multiple_objectives_mda_problem_experiments()
-    mda_problem_with_astar_epsilon_experiments()
-    mda_problem_anytime_astar_experiments()
+    # mda_problem_with_weighted_astar_experiments()
+    # monetary_cost_objectives_mda_problem_experiments()
+    # multiple_objectives_mda_problem_experiments()
+    # mda_problem_with_astar_epsilon_experiments()
+    # mda_problem_anytime_astar_experiments()
 
 
 if __name__ == '__main__':

@@ -105,6 +105,7 @@ class MDASumAirDistHeuristic(HeuristicFunction):
         src = state.current_site
         while len(all_certain_junctions_in_remaining_ambulance_path) > 0:
             min_distance = float('inf')
+            min_destination = Junction(float('inf'), 0 , 0, None, None)
             for destination in all_certain_junctions_in_remaining_ambulance_path:
                 distance = self.cached_air_distance_calculator.get_air_distance_between_junctions(src, destination)
                 if (distance, destination.index) < (min_distance,min_destination.index):
