@@ -326,7 +326,7 @@ class MDAProblem(GraphProblem):
         #Calculating total fridges gas consumption
         active_fridges = math.ceil(tests_on_ambulance/ fridge_capacity)
         total_fridges_gas_consumption = 0
-        for i in range(0,active_fridges): #plus 1?
+        for i in range(0,active_fridges):
             total_fridges_gas_consumption += fridges_gas_consumption[i]
 
         #Calculating monetary cost

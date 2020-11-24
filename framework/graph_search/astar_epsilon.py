@@ -39,7 +39,7 @@ class AStarEpsilon(AStar):
         Extracts the next node to expand from the open queue,
          by focusing on the current FOCAL and choosing the node
          with the best within_focal_priority from it.
-        TODO [Ex.42]: Implement this method!
+        [Ex.42]: Implement this method!
         Find the minimum expanding-priority value in the `open` queue.
         Calculate the maximum expanding-priority of the FOCAL, which is
          the min expanding-priority in open multiplied by (1 + eps) where
@@ -71,5 +71,29 @@ class AStarEpsilon(AStar):
          method should be kept in the open queue at the end of this method, except
          for the extracted (and returned) node.
         """
+        if len(self.open) == 0:
+            return None
 
-        raise NotImplementedError  # TODO: remove!
+        #q = SearchNodesPriorityQueue()
+
+        minimum_expanding_priority = min(item.expanding_priority
+                                         for item in q)
+        maximum_expanding_priority = minimum_expanding_priority * (1+ self.focal_epsilon)
+
+        focal = []
+        priority_value = []
+        for item in self.open:
+            if self.open.peek_next_node().expanding_priority <= maximum_expanding_priority:
+                if ((self.max_focal_size is not None) and (self.max_focal_size > len(focal))) or \
+                        self.max_focal_size is None:
+                    next = self.open.pop_next_node()
+                    focal.append(next)
+                    priority_value.append(self.within_focal_priority_function(next,problem ,self))
+
+        minimal_index = np.argmin(priority_value)
+        return_node =focal[minimal_index]
+        focal.remove(minimal_index)
+        for item in focal:
+            self.open.push_node(item)
+
+        return return_node
