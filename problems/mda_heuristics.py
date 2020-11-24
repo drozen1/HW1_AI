@@ -204,7 +204,7 @@ class MDATestsTravelDistToNearestLabHeuristic(HeuristicFunction):
         #we have tests on ambulance
         if len(state.tests_on_ambulance) != 0:
             number_of_tests = state.get_total_nr_tests_taken_and_stored_on_ambulance()
-            cost = number_of_tests + air_dist_to_closest_lab(state.current_location)
+            cost = number_of_tests * air_dist_to_closest_lab(state.current_location)
 
         #calculating second part of the cost
         list = self.problem.get_reported_apartments_waiting_to_visit(state)
