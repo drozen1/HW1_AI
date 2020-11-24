@@ -337,7 +337,7 @@ def mda_problem_anytime_astar_experiments():
     # create an instance of `AnytimeAStar` once with the `MDAMSTAirDistHeuristic`, with
     #       `max_nr_states_to_expand_per_iteration` set to 1000, solve the
     #       `moderate_mda_problem_with_distance_cost` with it and print the results.
-    astar = AnytimeAStar(MDAMSTAirDistHeuristic, max_nr_states_to_expand_per_iteration=100)
+    astar = AnytimeAStar(MDAMSTAirDistHeuristic, max_nr_states_to_expand_per_iteration=1000)
     res = astar.solve_problem(moderate_mda_problem_with_distance_cost)
     print(res)
 
