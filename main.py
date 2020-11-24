@@ -230,9 +230,8 @@ def mda_problem_with_weighted_astar_experiments():
     # Call here the function `run_astar_for_weights_in_range()`
     #       with `MDASumAirDistHeuristic`
     #       over the `moderate_mda_problem_with_distance_cost`.
-    print("beforee")
+
     run_astar_for_weights_in_range(MDASumAirDistHeuristic, moderate_mda_problem_with_distance_cost)
-    print("afterrr")
 
 
 def monetary_cost_objectives_mda_problem_experiments():
@@ -344,13 +343,13 @@ def mda_problem_anytime_astar_experiments():
 
 def run_all_experiments():
     print('Running all experiments')
-    #toy_map_problem_experiments()
-    #basic_mda_problem_experiments()
-    #mda_problem_with_astar_experiments()
-    #mda_problem_with_weighted_astar_experiments()
-    #monetary_cost_objectives_mda_problem_experiments()
-    #multiple_objectives_mda_problem_experiments()
-    #mda_problem_with_astar_epsilon_experiments()
+    toy_map_problem_experiments()
+    basic_mda_problem_experiments()
+    mda_problem_with_astar_experiments()
+    mda_problem_with_weighted_astar_experiments()
+    monetary_cost_objectives_mda_problem_experiments()
+    multiple_objectives_mda_problem_experiments()
+    mda_problem_with_astar_epsilon_experiments()
     mda_problem_anytime_astar_experiments()
 
 

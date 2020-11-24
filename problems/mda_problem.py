@@ -265,7 +265,7 @@ class MDAProblem(GraphProblem):
                                       nr_matoshim_on_ambulance=next_nr_matoshim_on_ambulance,
                                       visited_labs=next_visited_labs)
 
-                operator_name = "go to lab  " + lab.name
+                operator_name = "go to lab " + lab.name
                 yield OperatorResult(next_state, self.get_operator_cost(state_to_expand, next_state), operator_name)
 
     def get_operator_cost(self, prev_state: MDAState, succ_state: MDAState) -> MDACost:

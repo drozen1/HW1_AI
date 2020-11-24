@@ -65,6 +65,7 @@ class AnytimeAStar(GraphProblemSolver):
             #   but there is no solution using `low_heuristic_weight`.
             low_heuristic_weight = 0.5
             high_heuristic_weight = self.initial_high_heuristic_weight_bound
+
             while (high_heuristic_weight - low_heuristic_weight) > 0.01:
                 heuristic_weight = (low_heuristic_weight + high_heuristic_weight) / 2
                 max_nr_states_to_expand = self.max_nr_states_to_expand_per_iteration
