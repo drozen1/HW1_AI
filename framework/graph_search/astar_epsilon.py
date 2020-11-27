@@ -74,38 +74,27 @@ class AStarEpsilon(AStar):
         if len(self.open) == 0:
             return None
 
-        q = self.open
-        add_to_open_later = []
-        minimum_expanding_priority = q.peek_next_node().expanding_priority
-        while len(q) > 0:
-            next = q.pop_next_node()
-            add_to_open_later.append(next)
-            if next.expanding_priority < minimum_expanding_priority:
-                minimum_expanding_priority = next.expanding_priority
-
-        for item in add_to_open_later:
-            self.open.push_node(item)
-
+        minimum_expanding_priority = self.open.peek_next_node().expanding_priority
         maximum_expanding_priority = minimum_expanding_priority * (1 + self.focal_epsilon)
         focal = []
         priority_value = []
         add_to_open_later = []
         while len(self.open) != 0 and (((self.max_focal_size is not None) and (self.max_focal_size > len(focal))) or \
-                    self.max_focal_size is None):
-                next = self.open.pop_next_node()
-                if next.expanding_priority <= maximum_expanding_priority:
-                    focal.append(next)
-                    priority_value.append(self.within_focal_priority_function(next,problem ,self))
-                if next.expanding_priority > maximum_expanding_priority:
-                    add_to_open_later.append(next)
+                                       self.max_focal_size is None):
+            next = self.open.pop_next_node()
+            if next.expanding_priority <= maximum_expanding_priority:
+                focal.append(next)
+                priority_value.append(self.within_focal_priority_function(next, problem, self))
+            if next.expanding_priority > maximum_expanding_priority:
+                add_to_open_later.append(next)
 
         for item in add_to_open_later:
             self.open.push_node(item)
 
         minimal_index = np.argmin(priority_value)
-        return_node =focal[minimal_index]
+        return_node = focal[minimal_index]
         focal.remove(return_node)
         for item in focal:
             self.open.push_node(item)
-
+        self.close.add_node(return_node)
         return return_node
