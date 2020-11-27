@@ -208,7 +208,8 @@ class MDATestsTravelDistToNearestLabHeuristic(HeuristicFunction):
 
         #calculating second part of the cost
         list = self.problem.get_reported_apartments_waiting_to_visit(state)
-        for app in list:
-            cost += (air_dist_to_closest_lab(app.location) * app.nr_roommates)
+
+        cost += sum(air_dist_to_closest_lab(app.location) * app.nr_roommates
+                   for app in list)
 
         return cost
